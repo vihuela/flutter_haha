@@ -9,18 +9,19 @@ class ItemContent extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return ItemContentState(joke);
+    return ItemContentState();
   }
 }
 
 class ItemContentState extends State<ItemContent> {
-  final Joke joke;
+  Joke joke;
 
-  ItemContentState(this.joke);
+  ItemContentState();
 
   @override
   void initState() {
     super.initState();
+    joke = widget.joke;
   }
 
   @override
@@ -45,7 +46,8 @@ class ItemContentState extends State<ItemContent> {
     //labelView
     var content = joke.content.replaceAll("<br />", "");
     var isGif = imageUrl.endsWith("gif");
-    var isShowLabelView = isShowImage != null ? isGif || joke.pic.height >= 6666 : false;
+    var isShowLabelView =
+        isShowImage != null ? isGif || joke.pic.height >= 6666 : false;
     var labelText = isGif ? "GIF" : "Long";
     var labelColor = isGif ? 0xFFEE726E : 0xFF8e8e93;
 

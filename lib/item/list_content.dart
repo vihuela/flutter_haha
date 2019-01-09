@@ -4,20 +4,22 @@ import 'package:flutter_haha/view/LabelView.dart';
 
 class ListContent extends StatefulWidget {
   List jokes = [];
+  //itemBuilder须放外部,放内部setState不刷新
+  IndexedWidgetBuilder itemBuilder;
 
-  ListContent(this.jokes);
+  ListContent({
+    Key key,
+    @required this.jokes,
+    @required this.itemBuilder,
+  });
 
   @override
   State<StatefulWidget> createState() {
-    print('jokes,length:${jokes.length}');
-    return ListContentState(jokes);
+    return ListContentState();
   }
 }
 
 class ListContentState extends State<ListContent> {
-  List jokes = [];
-
-  ListContentState(this.jokes);
 
   @override
   void initState() {
@@ -32,16 +34,14 @@ class ListContentState extends State<ListContent> {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      itemCount: jokes.length,
+      itemCount: widget.jokes.length,
       separatorBuilder: (context, index) {
         return Divider(
           height: 10.0,
           color: Color(0xFFf2f3f5),
         );
       },
-      itemBuilder: (context, index) {
-        return ItemContent(jokes[index]);
-      },
+      itemBuilder: widget.itemBuilder,
     );
   }
 }

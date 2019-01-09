@@ -42,18 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var listContent = ListView.separated(
-      itemCount: jokes.length,
-      separatorBuilder: (context, index) {
-        return Divider(
-          height: 10.0,
-          color: Color(0xFFf2f3f5),
-        );
-      },
-      itemBuilder: (context, index) {
-        return ItemContent(jokes[index]);
-      },
-    );
     return Scaffold(
       appBar: AppBar(
         title: Center(
@@ -65,7 +53,12 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      body: listContent, //
+      body: ListContent(
+        jokes: jokes,
+        itemBuilder: (context, index) {
+          return ItemContent(jokes[index]);
+        },
+      ), //
     );
   }
 
