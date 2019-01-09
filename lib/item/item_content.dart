@@ -3,7 +3,7 @@ import 'package:flutter_haha/model/HahaListResponse.dart';
 import 'package:flutter_haha/view/LabelView.dart';
 
 class ItemContent extends StatefulWidget {
-  Joke joke;
+  final Joke joke;
 
   ItemContent(this.joke);
 
@@ -14,7 +14,7 @@ class ItemContent extends StatefulWidget {
 }
 
 class ItemContentState extends State<ItemContent> {
-  Joke joke;
+  final Joke joke;
 
   ItemContentState(this.joke);
 
@@ -31,14 +31,23 @@ class ItemContentState extends State<ItemContent> {
   @override
   Widget build(BuildContext context) {
     var padding = 10.0;
-
+    //time
+    var time = joke.time;
     //comment content
-    var isShowRefContent = true;
+    var isShowRefContent = joke.root != null;
+    var contentRef =
+        isShowRefContent ? joke.root.content.replaceAll("<br />", "") : "";
     //imageView
-    var isShowImage = true;
+    var isShowImage = joke.pic != null;
+    var imageUrl = isShowImage
+        ? "https://image.haha.mx/${joke.pic.path}/middle/${joke.pic.name}"
+        : "";
     //labelView
-    var isShowLabelView = true;
-    var isGif = true;
+    var content = joke.content.replaceAll("<br />", "");
+    var isGif = imageUrl.endsWith("gif");
+    var isShowLabelView = isShowImage != null ? isGif || joke.pic.height >= 6666 : false;
+    var labelText = isGif ? "GIF" : "Long";
+    var labelColor = isGif ? 0xFFEE726E : 0xFF8e8e93;
 
     var r1 = Flex(
       direction: Axis.vertical,
@@ -48,7 +57,7 @@ class ItemContentState extends State<ItemContent> {
         Padding(
           padding: EdgeInsets.fromLTRB(padding, padding, padding, 0),
           child: Text(
-            joke.content,
+            time,
             textAlign: TextAlign.start,
             style: TextStyle(color: Color(0xFF8e8e93), fontSize: 12.0),
             maxLines: 1,
@@ -59,7 +68,7 @@ class ItemContentState extends State<ItemContent> {
         Padding(
           padding: EdgeInsets.all(padding),
           child: Text(
-            "sdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsd",
+            content,
             textAlign: TextAlign.justify,
             style: TextStyle(color: Color(0xFF696969), fontSize: 15.0),
           ),
@@ -71,7 +80,7 @@ class ItemContentState extends State<ItemContent> {
           child: Padding(
             padding: EdgeInsets.fromLTRB(padding * 3, 0, padding, padding),
             child: Text(
-              "sdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsdsdsddsd",
+              contentRef,
               textAlign: TextAlign.justify,
               style: TextStyle(color: Color(0xFF8e8e93)),
             ),
@@ -84,7 +93,7 @@ class ItemContentState extends State<ItemContent> {
             //image
             children: <Widget>[
               Image.network(
-                "https://file.digitaling.com/eImg/uimages/20170104/1483513576654699.jpg",
+                imageUrl,
               ),
               Visibility(
                   visible: isShowLabelView,
@@ -93,8 +102,8 @@ class ItemContentState extends State<ItemContent> {
                     Size(500, 120),
                     useAngle: false,
                     labelAlignment: LabelAlignment.rightTop,
-                    labelText: isGif ? "GIF" : "Long",
-                    labelColor: Color(isGif ? 0xFFEE726E : 0xFF8e8e93),
+                    labelText: labelText,
+                    labelColor: Color(labelColor),
                   ))
             ],
           ),
