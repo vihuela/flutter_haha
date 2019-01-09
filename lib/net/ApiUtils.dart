@@ -6,16 +6,21 @@ import 'package:flutter_haha/model/HahaListResponse.dart';
 class ApiUtils {
   static const String BasicUrl = "http://www.haha.mx/mobile_app_data_api.php";
 
-
-  static hahaListRequest(Function call) async {
+  static hahaListRequest(Function call, loadMode, page) async {
     try {
       Response response;
-      response = await Dio().request(
+      var dio = Dio();
+      dio.interceptor.request.onSend = (options) {
+        print(
+            'dioUrl:${options.baseUrl}${options.path} data:${options.data.toString()}');
+        return options;
+      };
+      response = await dio.request(
         "",
         data: {
           "r": "joke_list",
           "type": "web_good",
-          "page": 1,
+          "page": page,
           "id": 1,
           "range": ""
         },

@@ -64,8 +64,12 @@ Map<String, dynamic> _$JokeToJson(Joke instance) => <String, dynamic>{
     };
 
 Pic _$PicFromJson(Map<String, dynamic> json) {
-  return Pic(json['path'] as String, json['name'] as String,
-      json['width'] as int, json['height'] as int, json['animated'] as int);
+  return Pic(
+      json['path'] as String,
+      json['name'] as String,
+      json['width'] as int ?? 0,
+      json['height'] as int ?? 0,
+      json['animated'] as int);
 }
 
 Map<String, dynamic> _$PicToJson(Pic instance) => <String, dynamic>{

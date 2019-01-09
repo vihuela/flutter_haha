@@ -47,7 +47,7 @@ class ItemContentState extends State<ItemContent> {
     var content = joke.content.replaceAll("<br />", "");
     var isGif = imageUrl.endsWith("gif");
     var isShowLabelView =
-        isShowImage != null ? isGif || joke.pic.height >= 6666 : false;
+        isShowImage ? isGif || joke.pic.height >= 6666 : false;
     var labelText = isGif ? "GIF" : "Long";
     var labelColor = isGif ? 0xFFEE726E : 0xFF8e8e93;
 

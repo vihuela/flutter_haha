@@ -103,10 +103,10 @@ class Pic {
   @JsonKey(name: 'name')
   String name;
 
-  @JsonKey(name: 'width')
+  @JsonKey(name: 'width', defaultValue: 0)
   int width;
 
-  @JsonKey(name: 'height')
+  @JsonKey(name: 'height', defaultValue: 0)
   int height;
 
   @JsonKey(name: 'animated')
