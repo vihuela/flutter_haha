@@ -6,6 +6,7 @@ import 'package:flutter_haha/item/item_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_haha/net/ApiUtils.dart';
 import 'package:flutter_haha/view/loadmore_widget.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 void main() => runApp(MyApp());
 
@@ -35,11 +36,17 @@ class _MyHomePageState extends State<MyHomePage> {
   List jokes = [];
   int currentListPage = 1;
   bool isLoadMoreFinish = false;
+  GlobalKey<EasyRefreshState> _easyRefreshKey =
+      new GlobalKey<EasyRefreshState>();
+  GlobalKey<RefreshHeaderState> _headerKey =
+      new GlobalKey<RefreshHeaderState>();
+  GlobalKey<RefreshFooterState> _footerKey =
+      new GlobalKey<RefreshFooterState>();
 
   @override
   void initState() {
     super.initState();
-    getData();
+//    getData();
   }
 
   @override
@@ -50,14 +57,29 @@ class _MyHomePageState extends State<MyHomePage> {
           child: GestureDetector(
             child: Text("haha.mx"),
             onTap: () {
-              getData();
+//              getData();
             },
           ),
         ),
       ),
-      body: LoadMore(
-        isFinish: isLoadMoreFinish,
-        onLoadMore: _loadMore,
+
+      body: EasyRefresh(
+        key: _easyRefreshKey,
+        behavior: ScrollOverBehavior(),
+        refreshHeader: ClassicsHeader(
+          key: _headerKey,
+          bgColor: Colors.transparent,
+          textColor: Colors.black87,
+          moreInfoColor: Colors.black54,
+          showMore: true,
+        ),
+        refreshFooter: ClassicsFooter(
+          key: _footerKey,
+          bgColor: Colors.transparent,
+          textColor: Colors.black87,
+          moreInfoColor: Colors.black54,
+          showMore: true,
+        ),
         child: ListView.separated(
           itemCount: jokes.length,
           separatorBuilder: (context, index) {
@@ -68,45 +90,60 @@ class _MyHomePageState extends State<MyHomePage> {
           },
           itemBuilder: (context, index) => ItemContent(jokes[index]),
         ),
-        whenEmptyLoad: false,
-        delegate: DefaultLoadMoreDelegate(),
-        textBuilder: DefaultLoadMoreTextBuilder.chinese,
+        onRefresh: () {
+          ApiUtils.hahaListRequest(false, 1).then((res) {
+            setState(() {
+              jokes = res.joke;
+            });
+          });
+        },
+        loadMore: () async {
+//          await new Future.delayed(const Duration(seconds: 1), () {
+//            if (str.length < 20) {
+//              setState(() {
+//                str.addAll(addStr);
+//              });
+//            }
+//          });
+        },
       ), //
     );
   }
 
-  getData({loadMode = false, page = 1, Function call}) {
-    ApiUtils.hahaListRequest(
-      (data) {
-        HahaListResponse response = data;
-        setState(() {
-          currentListPage = int.parse(response.page);
-          isLoadMoreFinish = response.joke.isEmpty;
-
-          if (!loadMode) {
-            //refresh
-            jokes = response.joke;
-            currentListPage = 1;
-          } else {
-            //loadMore
-            jokes.addAll(response.joke);
-          }
-          if (call != null) call(isLoadMoreFinish);
-        });
-      },
-      loadMode,
-      page,
-    );
-  }
-
-  Future<bool> _loadMore() async {
-    print('_loadMore');
-    getData(
-        loadMode: true,
-        page: ++currentListPage,
-        call: (v) {
-          return v;
-        });
-    return true;
-  }
+//  getData({loadMode = false, page = 1}) {
+//    ApiUtils.hahaListRequest(
+//      (data) {
+//        if (data != null) {
+//          HahaListResponse response = data;
+//          setState(() {
+//            currentListPage = int.parse(response.page);
+//            isLoadMoreFinish = response.joke.isEmpty;
+//
+//            print('isLoadMoreFinish:$isLoadMoreFinish');
+//            if (!loadMode) {
+//              //refresh
+//              jokes = response.joke;
+//              currentListPage = 1;
+//            } else {
+//              //loadMore
+//              jokes.addAll(response.joke);
+//            }
+//            return isLoadMoreFinish;
+//          });
+//        } else {
+//          return false;
+//        }
+//      },
+//      loadMode,
+//      page,
+//    );
+//  }
+//
+//  Future<bool> _loadMore() async {
+//    print('_loadMore');
+//    return await getData(
+//      loadMode: true,
+//      page: ++currentListPage,
+//    );
+//  }
 }
