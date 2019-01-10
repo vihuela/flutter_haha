@@ -6,7 +6,7 @@ import 'package:flutter_haha/model/HahaListResponse.dart';
 class ApiUtils {
   static const String BasicUrl = "http://www.haha.mx/mobile_app_data_api.php";
 
-  static Future<HahaListResponse> hahaListRequest(loadMode, page) async {
+  static Future<HahaListResponse> hahaListRequest(page) async {
     Response response;
     var dio = Dio();
     dio.interceptor.request.onSend = (options) {

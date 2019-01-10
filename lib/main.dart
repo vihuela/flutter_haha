@@ -91,59 +91,22 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (context, index) => ItemContent(jokes[index]),
         ),
         onRefresh: () {
-          ApiUtils.hahaListRequest(false, 1).then((res) {
+          ApiUtils.hahaListRequest(1).then((res) {
             setState(() {
+              currentListPage = 1;
               jokes = res.joke;
             });
           });
         },
         loadMore: () async {
-//          await new Future.delayed(const Duration(seconds: 1), () {
-//            if (str.length < 20) {
-//              setState(() {
-//                str.addAll(addStr);
-//              });
-//            }
-//          });
+          ApiUtils.hahaListRequest(++currentListPage).then((res) {
+            setState(() {
+              currentListPage = int.parse(res.page);
+              jokes.addAll(res.joke);
+            });
+          });
         },
       ), //
     );
   }
-
-//  getData({loadMode = false, page = 1}) {
-//    ApiUtils.hahaListRequest(
-//      (data) {
-//        if (data != null) {
-//          HahaListResponse response = data;
-//          setState(() {
-//            currentListPage = int.parse(response.page);
-//            isLoadMoreFinish = response.joke.isEmpty;
-//
-//            print('isLoadMoreFinish:$isLoadMoreFinish');
-//            if (!loadMode) {
-//              //refresh
-//              jokes = response.joke;
-//              currentListPage = 1;
-//            } else {
-//              //loadMore
-//              jokes.addAll(response.joke);
-//            }
-//            return isLoadMoreFinish;
-//          });
-//        } else {
-//          return false;
-//        }
-//      },
-//      loadMode,
-//      page,
-//    );
-//  }
-//
-//  Future<bool> _loadMore() async {
-//    print('_loadMore');
-//    return await getData(
-//      loadMode: true,
-//      page: ++currentListPage,
-//    );
-//  }
 }
