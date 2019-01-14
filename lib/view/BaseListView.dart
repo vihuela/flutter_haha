@@ -11,20 +11,33 @@ typedef Future LoadMore();
 //如果setState不刷新，将此widget放于build回调中
 //datas与itemBuilder暴露外部，避免setState不刷新
 class BaseListView<T> extends StatefulWidget {
+  final ViewStates viewStates;
+  final List datas;
+  ScrollController scrollController = new ScrollController();
+
   ItemBuilder itemBuilder;
+
   OnRefresh onRefresh;
   LoadMore loadMore;
-  List<T> datas = [];
-  ViewStates viewStates = ViewStates.Loading;
 
   BaseListView({
     Key key,
-    @required this.datas,
     @required this.itemBuilder,
+    @required this.datas,
+    this.viewStates,
     this.onRefresh,
     this.loadMore,
-    this.viewStates,
   });
+
+  void scrollToTop() async {
+    if (scrollController.hasClients) {
+      await scrollController.animateTo(
+        0.0,
+        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 300),
+      );
+    }
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -61,7 +74,8 @@ class _BaseListView extends State<BaseListView> {
         showMore: true,
       ),
       child: ListView.separated(
-        itemCount: widget.datas.length,
+        controller: widget.scrollController,
+        itemCount: widget.datas != null ? widget.datas.length : 0,
         separatorBuilder: (context, index) {
           return Divider(
             height: 10.0,
@@ -72,25 +86,37 @@ class _BaseListView extends State<BaseListView> {
           return widget.itemBuilder(widget.datas, index);
         },
       ),
-      onRefresh: () {
-        widget.onRefresh();
-      },
-      loadMore: () {
-        widget.loadMore();
-      },
+      onRefresh: widget.onRefresh ?? null,
+      loadMore: widget.loadMore ?? null,
     );
-    if (widget.viewStates == ViewStates.Loading) {
-      return LoadingItem();
-    } else if (widget.viewStates == ViewStates.Error && widget.datas.isEmpty) {
-      return RetryItem(() {
-        widget.onRefresh();
-      });
-    } else if (widget.viewStates == ViewStates.Empty) {
-      return EmptyItem(() {
-        widget.onRefresh();
-      });
-    } else {
-      return listView;
+
+    switch (widget.viewStates) {
+      case ViewStates.None:
+        {
+          return listView;
+        }
+        break;
+      case ViewStates.Error:
+        {
+          if (widget.datas == null || widget.datas.isEmpty) {
+            return RetryItem(() {
+              widget.onRefresh();
+            });
+          }
+        }
+        break;
+      case ViewStates.Empty:
+        {
+          return EmptyItem(() {
+            widget.onRefresh();
+          });
+        }
+        break;
+      default:
+        {
+          return LoadingItem();
+        }
+        break;
     }
   }
 }
@@ -102,6 +128,7 @@ enum ViewStates {
   Empty,
 }
 
+@immutable
 class LoadingItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -111,8 +138,9 @@ class LoadingItem extends StatelessWidget {
   }
 }
 
+@immutable
 class RetryItem extends StatelessWidget {
-  GestureTapCallback ontap;
+  final GestureTapCallback ontap;
 
   RetryItem(this.ontap);
 
@@ -126,8 +154,9 @@ class RetryItem extends StatelessWidget {
   }
 }
 
+@immutable
 class EmptyItem extends StatelessWidget {
-  GestureTapCallback ontap;
+  final GestureTapCallback ontap;
 
   EmptyItem(this.ontap);
 
