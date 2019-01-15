@@ -1,13 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_haha/item/item_content.dart';
 import 'package:flutter_haha/model/HahaListResponse.dart';
 import 'package:flutter_haha/net/Api.dart';
-import 'package:flutter_haha/item/item_content.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_haha/net/ApiUtils.dart';
+import 'package:flutter_haha/net/ErrorData.dart';
 import 'package:flutter_haha/view/BaseListView.dart';
-import 'package:flutter_haha/view/loadmore_widget.dart';
-import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 void main() => runApp(MyApp());
 
@@ -39,14 +36,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
   int currentListPage = 1;
 
+  String errorInfo;
+
   @override
   void initState() {
     super.initState();
     //首次获取
-    ApiUtils.hahaListRequest(1).then((res) {
+    Api.hahaListRequest(1).then((res) {
       setState(() {
         viewStates = ViewStates.None;
         jokes = res.joke;
+      });
+    }).catchError((e) {
+      setState(() {
+        viewStates = ViewStates.Error;
+        errorInfo = (e as ErrorData).message;
       });
     });
   }
@@ -57,19 +61,33 @@ class _MyHomePageState extends State<MyHomePage> {
       datas: jokes,
       itemBuilder: (datas, index) => ItemContent(datas[index]),
       viewStates: viewStates,
+      errorInfo: errorInfo,
       onRefresh: () {
-        ApiUtils.hahaListRequest(1).then((res) {
+        Api.hahaListRequest(1).then((res) {
           setState(() {
+            viewStates = ViewStates.None;
             currentListPage = 1;
             jokes = res.joke;
+          });
+        }).catchError((e) {
+          setState(() {
+            viewStates = ViewStates.Error;
+            errorInfo = (e as ErrorData).message;
           });
         });
       },
       loadMore: () {
-        ApiUtils.hahaListRequest(++currentListPage).then((res) {
+        Api.hahaListRequest(++currentListPage).then((res) {
           setState(() {
+            viewStates = ViewStates.None;
             currentListPage = int.parse(res.page);
             jokes.addAll(res.joke);
+          });
+        }).catchError((e) {
+          setState(() {
+            currentListPage--;
+            viewStates = ViewStates.Error;
+            errorInfo = (e as ErrorData).message;
           });
         });
       },

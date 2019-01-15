@@ -1,13 +1,12 @@
-mixin BaseView {
-  void showLoading();
+class ErrorData {
+  String message;
+  NetError errorType;
 
-  void hideLoading();
+  ErrorData.name(this.message, this.errorType);
 
-  void showEmpty();
+  ErrorData();
 
-  void showContent();
 
-  void showMessage(String content, NetError error);
 }
 
 enum NetError {

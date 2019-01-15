@@ -27,6 +27,7 @@ dependencies:
    # (可选)刷新bean代码：flutter packages pub run build_runner watch
   json_annotation: ^2.0.0
   flutter_easyrefresh: ^1.1.1
+  fluttertoast: ^2.2.6
 
 dev_dependencies:
   flutter_test:
